@@ -1,21 +1,38 @@
-from flask import Flask,request,Response
-from flask_cors import CORS
-from logging import INFO
+from flask import Flask 
+from flask_socketio import SocketIO,send,emit
 from TTS import stream_kokoro_audio
-import json
+
 
 app = Flask(__name__)
 
-CORS(app)
-
-@app.route('/TTS',methods=['GET','POST'])
-def tts():
-    query = request.get_json()
-    text = query.get('input','')
-
-    return Response(stream_kokoro_audio(text),mimetype='application/octet-stream')
-
+socketio = SocketIO(
+    app,
+    cors_allowed_origins=[
+        "http://localhost:5173",
+        "file://",
+    ],
+)
 
 
+@socketio.on('connect')
+def handleConnect(auth):
+    print('recieved the following params:- ',auth)
 
-app.run(debug=True)
+
+
+@socketio.on("speak")
+def handle_speak(data):
+    text = data["text"]
+    
+    if text == None:
+        print('got the None Text returning')
+        return
+    for audio_bytes in stream_kokoro_audio(text):
+        emit(
+            "tts_audio_chunk",
+            audio_bytes,
+            binary=True,
+        )
+
+if __name__ == '__main__':
+    socketio.run(app)

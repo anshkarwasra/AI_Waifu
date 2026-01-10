@@ -3,21 +3,15 @@ import { VRM, VRMLoaderPlugin, VRMUtils } from "@pixiv/three-vrm"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
 import { useRef, useEffect, useState, RefObject } from "react"
 import { useAnimations } from "@react-three/drei"
-import { setExprression } from "../../utils/setExpression"
 import { parseAnimationFbx } from "../../utils/parseFBXAnimation"
-import { playStream } from "../../utils/textToSpeech"
-import { unlockAudio } from "../../utils/audioManager"
+import { VRMProps } from "src/renderer/utils/types/types"
 
 
-export const say = async (text) => {
-    await unlockAudio();
-    await playStream(text);
-}
 
 
-function VRMModel(props) {
+function VRMModel({ animation,getTargetLip }:VRMProps) {
     const vrmRef: RefObject<VRM | null> = useRef<VRM | null>(null);
-    const [Animation, setAnimation] = useState<string | null>(props.animation);
+    const [Animation, setAnimation] = useState<string | null>(animation);
     const gltf = useLoader(GLTFLoader, '/waifu.vrm', (loader) => {
         loader.register((parser) => new VRMLoaderPlugin(parser))
     })
@@ -55,17 +49,23 @@ function VRMModel(props) {
         const vrm = gltf?.userData.vrm;
         VRMUtils.removeUnnecessaryVertices(gltf.scene);
         VRMUtils.combineSkeletons(gltf.scene);
-        VRMUtils.combineMorphs(vrm);
+        // VRMUtils.combineMorphs(vrm);
 
         vrm.scene.traverse((obj) => {
             obj.fructumCulled = false;
         })
     }, [gltf.scene])
 
+    
+   
     // Update VRM every frame
-    useFrame((state, delta) => {
+    useFrame((_, delta) => {
         if (vrmRef.current) {
+           const v = getTargetLip();
 
+            vrmRef.current.expressionManager?.setValue("aa", v);
+            vrmRef.current.expressionManager?.setValue("oh", v * 0.6);  
+            console.log('the value of v is:- ',v)
             vrmRef.current.update(delta)
         }
     })

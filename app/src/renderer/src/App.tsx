@@ -1,14 +1,28 @@
 
 import { Canvas } from '@react-three/fiber'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
+import { useWaifuSocket } from '../utils/hooks/useWaifu'
 import React from 'react'
 import { OrbitControls } from '@react-three/drei'
 import VRMModel from './components/Vrm'
 
 export default function App() {
-  
+
+  const [inp, setInp] = useState<string>('');
+  const { getSocket,getTargetLip} = useWaifuSocket();
+  const waifuSocket = getSocket();
+  const onInpFieldChange = (e:ChangeEvent)=>{
+    setInp(e.target.value)
+  }
+
+  const onSubmitBtn = ()=>{
+    waifuSocket?.emit("speak",{
+      text:inp,
+    })
+  }
+
   return (
-    <div style={{ width: '100vw', height: '70vh' }}>
+    <div style={{ width: '100vw', height: '270vh' }}>
       <div className='bg-black h-full'>
         <Canvas camera={{ position: [0, 1.4, 3.8], fov: 30 }}>
         
@@ -18,7 +32,7 @@ export default function App() {
         {/* <gridHelper args={[10, 10]} /> */}
         
         <React.Suspense fallback={null}>
-            <VRMModel animation={null} />
+            <VRMModel animation={null} getTargetLip={getTargetLip} />
          
         </React.Suspense>
         
@@ -26,7 +40,11 @@ export default function App() {
         
       </Canvas>
       </div>
-      
+      {/* creating a debug section for now  */}
+      <div className="testInpSection">
+        <input type="text" onChange={onInpFieldChange} />
+        <button onClick={onSubmitBtn}>submit</button>
+      </div>
     </div>
   )
 }
