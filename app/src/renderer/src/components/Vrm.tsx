@@ -11,6 +11,7 @@ import { VRMProps } from "src/renderer/utils/types/types"
 
 function VRMModel({ animation,getTargetLip }:VRMProps) {
     const vrmRef: RefObject<VRM | null> = useRef<VRM | null>(null);
+    const [ isLoading,setIsLoading ] = useState<boolean>(true);
     const [Animation, setAnimation] = useState<string | null>(animation);
     const gltf = useLoader(GLTFLoader, '/waifu.vrm', (loader) => {
         loader.register((parser) => new VRMLoaderPlugin(parser))
@@ -33,6 +34,7 @@ function VRMModel({ animation,getTargetLip }:VRMProps) {
         }
     }
     useEffect(() => {
+        if (vrm) setIsLoading(true);
         if (Animation) {
             actions.actions[Animation]?.play()
         }
@@ -77,7 +79,7 @@ function VRMModel({ animation,getTargetLip }:VRMProps) {
 
 
 
-    return <primitive object={vrm.scene} />
+    return isLoading? <primitive object={vrm.scene} /> : <div className="text-white">Loading VRM Please wait</div>
 }
 
 export default VRMModel
