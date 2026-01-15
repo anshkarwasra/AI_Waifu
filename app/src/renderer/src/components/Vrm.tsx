@@ -67,7 +67,7 @@ function VRMModel({ animation,getTargetLip }:VRMProps) {
 
             vrmRef.current.expressionManager?.setValue("aa", v);
             vrmRef.current.expressionManager?.setValue("oh", v * 0.6);  
-            console.log('the value of v is:- ',v)
+            // console.log('the value of v is:- ',v)
             vrmRef.current.update(delta)
         }
     })

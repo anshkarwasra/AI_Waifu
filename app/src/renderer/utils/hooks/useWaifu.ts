@@ -12,15 +12,21 @@ export function useWaifuSocket() {
     useEffect(() => {
         const socket = io("http://127.0.0.1:5000", {
             transports: ["websocket"],
+            auth: {
+                personality:'tsundere'
+            }
         });
         socketRef.current = socket;
 
-
-        let lastAudioTime = performance.now();
-        socket.on("tts_audio_chunk", (chunk: ArrayBuffer) => {
+        // let lastAudioTime = performance.now();
+        socket.on("audioStream", (chunk: ArrayBuffer) => {
             player.feed(chunk);
   
         });
+        socket.on('waifuMetaData',(data:JSON) => {
+            console.log('got the following meta data for the waifu',data);
+        })
+
 
         return () => {
             socket.disconnect();
