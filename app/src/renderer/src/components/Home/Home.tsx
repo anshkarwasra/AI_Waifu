@@ -1,12 +1,20 @@
 import VRMModel from "../Vrm"
 import Icon from "../settings/Icon"
 import { Canvas } from "@react-three/fiber"
-import React from "react"
+import React, { useEffect } from "react"
 import { OrbitControls } from "@react-three/drei"
 import { useWaifuSocket } from "../../../utils/hooks/useWaifu"
+import { useMicControl } from "../../../utils/hooks/useMicController"
 
 const Home = () => {
     const { getTargetLip } = useWaifuSocket();
+    const { startTalking,stopTalking } = useMicControl();
+
+    useEffect(()=>{
+      startTalking()
+
+      return ()=> stopTalking()
+    },[])
   return (
     <div className="flex  h-screen w-screen">
       <div className="left bg-black relative w-2/3">

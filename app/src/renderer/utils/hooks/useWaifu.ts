@@ -17,6 +17,8 @@ export function useWaifuSocket() {
             }
         });
         socketRef.current = socket;
+        socket.on("close",()=>console.log("Disconnected from the backend"))
+        socket.on("err",(err)=>console.log("Backend Error:- ",err))
 
         // let lastAudioTime = performance.now();
         socket.on("audioStream", (chunk: ArrayBuffer) => {

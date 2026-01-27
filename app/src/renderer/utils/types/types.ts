@@ -1,5 +1,6 @@
 // types.ts
 
+
 // ============= VRM & Rendering =============
 export interface VRMProps {
     animation: string;
@@ -142,3 +143,5 @@ export interface QueueManager<T> {
     clear: () => void;
     peek: () => T | null;
 }
+
+
